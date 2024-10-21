@@ -1,8 +1,8 @@
 package com.iamashad.pokedex.model
 
 data class Other(
-    val dream_world: DreamWorld,
+    val dreamWorld: DreamWorld,
     val home: Home,
-    val official-artwork: OfficialArtwork,
+    val officialArtwork: OfficialArtwork,
     val showdown: Showdown
 )

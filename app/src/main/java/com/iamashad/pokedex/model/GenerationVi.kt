@@ -1,6 +1,6 @@
 package com.iamashad.pokedex.model
 
 data class GenerationVi(
-    val omegaruby-alphasapphire: OmegarubyAlphasapphire,
-    val x-y: XY
+    val omegarubyAlphasapphire: OmegarubyAlphasapphire,
+    val xY: XY
 )

@@ -1,8 +1,8 @@
 package com.iamashad.pokedex.model
 
 data class XY(
-    val front_default: String,
-    val front_female: Any,
-    val front_shiny: String,
-    val front_shiny_female: Any
+    val frontDefault: String,
+    val frontFemale: Any,
+    val frontShiny: String,
+    val frontShinyFemale: Any
 )
