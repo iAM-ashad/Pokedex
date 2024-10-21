@@ -1,6 +1,8 @@
 package com.iamashad.pokedex.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -22,16 +24,24 @@ fun PokedexNavigation (
        }
         val detailsRoute = PokedexScreens.DETAILSCREEN.name
        composable(
-           route = "$detailsRoute/{pokeCard}",
+           route = "$detailsRoute/{pokeName}/{dominantColor}",
            arguments = listOf(
-               navArgument("pokeCard") {
+               navArgument("pokeName") {
                    type = NavType.StringType
+               },
+               navArgument("dominantColor") {
+                   type = NavType.IntType
                }
            )
        ) {navBackStackEntry ->
-           navBackStackEntry.arguments?.getString("pokeCard").let { pokeCard->
-               DetailScreen(navController = navController, pokeCard)
+           val dominantColor = remember {
+               val color = navBackStackEntry.arguments?.getInt("dominantColor")
+               color?.let { Color(it) } ?: Color.White
            }
+           val pokeName = remember {
+               navBackStackEntry.arguments?.getString("pokeName")
+           }
+           DetailScreen(navController, dominantColor, pokeName)
        }
     }
 }
