@@ -1,5 +1,6 @@
 package com.iamashad.pokedex.screens.details
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.iamashad.pokedex.model.Pokemon
 import com.iamashad.pokedex.repository.PokemonRepository
@@ -12,6 +13,7 @@ class DetailsViewModel @Inject constructor (
     private val repository: PokemonRepository
 ): ViewModel() {
     suspend fun getPokemonInfo(pokemonName: String): Resource<Pokemon> {
-        return repository.getPokemonInfo(pokemonName)
+        val result = repository.getPokemonInfo(pokemonName)
+        return result
     }
 }

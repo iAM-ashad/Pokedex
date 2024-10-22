@@ -88,7 +88,7 @@ dependencies {
     implementation (libs.androidx.lifecycle.runtime.ktx.v231)
 
     // Coil
-    implementation("io.coil-kt.coil3:coil-compose:3.0.0-rc01")
+    implementation(libs.coil.compose)
     implementation (libs.coil)
     implementation (libs.accompanist.coil)
 
@@ -98,6 +98,9 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.fragment)
     //implementation(libs.androidx.hilt.work)
     implementation(libs.androidx.hilt.navigation.compose)
+
+    // Glide
+    implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
 
     // Palette
     implementation(libs.androidx.palette.ktx)

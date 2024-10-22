@@ -5,7 +5,7 @@ data class Sprites(
     val backFemale: Any,
     val backShiny: String,
     val backShinyFemale: Any,
-    val frontDefault: String,
+    val front_default: String,
     val frontFemale: Any,
     val frontShiny: String,
     val frontShinyFemale: Any,

@@ -1,6 +1,6 @@
 package com.iamashad.pokedex.screens.details
 
-import android.util.Log
+import android.widget.ImageView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -25,14 +25,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
-import coil.request.ImageRequest
-import coil3.compose.AsyncImage
-import com.iamashad.pokedex.R
+import com.bumptech.glide.Glide
 import com.iamashad.pokedex.model.Pokemon
 import com.iamashad.pokedex.utils.Resource
 
@@ -95,24 +92,20 @@ fun DetailScreen (
         ) {
             if(pokemonInfo is Resource.Success) {
                 pokemonInfo.data?.sprites?.let {
-                    AsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(it.frontDefault)
-                            .crossfade(true)
-                            .build(),
-                        contentDescription = "Pokemon Image",
-                        modifier = Modifier
-                            .size(pokemonImageSize)
-                            .offset(y = topPadding),
-                        placeholder = painterResource(R.drawable.ic_launcher_background),
-                        onSuccess = {
-                            Log.d("Coil", "Image Loaded Successfully")
-                        },
-                        onError = {
-                            Log.d("Coil", "Error loading image")
+                    val img = pokemonInfo.data.sprites.front_default
+                    when (img) {
+                        null -> {
+                            CircularProgressIndicator()
                         }
-                    )
-
+                        else -> {
+                           LoadImageWithGlide (
+                               imageUrl = img,
+                               modifier = Modifier
+                                   .size(pokemonImageSize)
+                                   .offset(y = topPadding)
+                           )
+                        }
+                    }
                 }
             }
         }
@@ -136,7 +129,7 @@ fun PokemonDetailTopSection (
         IconButton (
             modifier = Modifier
                 .size(36.dp)
-                .offset(16.dp,16.dp),
+                .offset(16.dp, 16.dp),
             onClick = {
                 navController.popBackStack()
             }
@@ -178,3 +171,26 @@ fun PokemonStateWrapper(
         }
     }
 }
+
+@Composable
+fun LoadImageWithGlide(
+    imageUrl: String,
+    modifier: Modifier = Modifier
+) {
+    AndroidView(
+        factory = { context ->
+            ImageView(context).apply {
+                scaleType = ImageView.ScaleType.CENTER_CROP
+            }
+        },
+        modifier = modifier,
+        update = { imageView ->
+            // Use Glide to load the image
+            Glide.with(imageView.context)
+                .load(imageUrl)
+                .into(imageView)
+        }
+    )
+}
+
+
