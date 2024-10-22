@@ -2,14 +2,21 @@ package com.iamashad.pokedex.screens.details
 
 import android.widget.ImageView
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
@@ -17,21 +24,33 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import com.bumptech.glide.Glide
+import com.iamashad.pokedex.R
 import com.iamashad.pokedex.model.Pokemon
+import com.iamashad.pokedex.model.Type
 import com.iamashad.pokedex.utils.Resource
+import com.iamashad.pokedex.utils.parseTypeToColor
+import java.util.Locale
+import kotlin.math.round
 
 @Composable
 fun DetailScreen (
@@ -153,7 +172,11 @@ fun PokemonStateWrapper(
 ) {
     when (pokemonInfo) {
         is Resource.Success -> {
-
+            PokemonDetailSection(
+                pokemonInfo = pokemonInfo.data!!,
+                modifier = Modifier
+                    .offset(y = (-20).dp)
+            )
         }
         is Resource.Error -> {
             Text (
@@ -192,4 +215,124 @@ fun LoadImageWithGlide(
     )
 }
 
+@Composable
+fun PokemonDetailSection (
+    pokemonInfo: Pokemon,
+    modifier: Modifier = Modifier
+) {
+    val scrollState = rememberScrollState()
 
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .offset(y = 100.dp)
+            .verticalScroll(scrollState)
+    ) {
+        Text(
+            text = "#${pokemonInfo.id} ${pokemonInfo.name.capitalize(Locale.ROOT)}",
+            fontWeight = FontWeight.Bold,
+            fontSize = 25.sp,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = modifier
+                .fillMaxWidth()
+        )
+        PokemonTypeSection(types = pokemonInfo.types)
+        PokemonDetailDataSection(
+            pokemonWeight = pokemonInfo.weight,
+            pokemonHeight = pokemonInfo.height
+        )
+    }
+}
+
+@Composable
+fun PokemonTypeSection(
+    types: List<Type>
+) {
+    Row (
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .padding(16.dp)
+    ) {
+        for (type in types) {
+            Box (
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 8.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(parseTypeToColor(type))
+                    .height(35.dp)
+            ) {
+                Text (
+                    text = type.type.name.capitalize(Locale.ROOT),
+                    color = Color.White,
+                    fontSize = 18.sp
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun PokemonDetailDataSection(
+    pokemonWeight: Int,
+    pokemonHeight: Int,
+    sectionHeight: Dp = 80.dp
+) {
+    val pokemonWeightInKg = remember {
+        round(pokemonWeight/10f)
+    }
+    val pokemonHeightInM = remember {
+        round(pokemonHeight/10f)
+    }
+    Row (
+        modifier = Modifier
+            .fillMaxWidth()
+    ){
+        PokemonDetailDataItem(
+            dataValue = pokemonWeightInKg,
+            dataUnit = "kg",
+            dataIcon = painterResource(R.drawable.ic_weight),
+            modifier = Modifier
+                .weight(1f)
+        )
+
+        VerticalDivider(
+            color = MaterialTheme.colorScheme.inverseOnSurface
+        )
+
+        PokemonDetailDataItem(
+            dataValue = pokemonHeightInM,
+            dataUnit = "m",
+            dataIcon = painterResource(R.drawable.ic_height),
+            modifier = Modifier
+                .weight(1f)
+        )
+    }
+}
+
+@Composable
+fun PokemonDetailDataItem(
+    dataValue: Float,
+    dataUnit: String,
+    dataIcon: Painter,
+    modifier: Modifier = Modifier
+) {
+    Column (
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = modifier
+    ){
+        Icon (
+            painter = dataIcon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurface
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "$dataValue$dataUnit",
+            color = MaterialTheme.colorScheme.onSurface
+        )
+    }
+}
