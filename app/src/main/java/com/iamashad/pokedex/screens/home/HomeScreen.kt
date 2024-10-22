@@ -2,6 +2,7 @@ package com.iamashad.pokedex.screens.home
 
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -31,6 +33,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
@@ -66,7 +70,7 @@ fun HomeScreen(
     ) {
         Column (
             modifier = Modifier,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(30.dp))
             Image (
@@ -82,10 +86,24 @@ fun HomeScreen(
                 modifier = Modifier
                     .padding(bottom = 25.dp)
             ) {
-                //Log.d("Search Made", "Searched for: $it")
+                viewModel.searchPokemon(it)
             }
             Spacer(modifier = Modifier.height(20.dp))
             PokemonList(navController = navController)
+        }
+    }
+    Box (
+        contentAlignment = Center,
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        if (viewModel.isLoading.value) {
+            CircularProgressIndicator()
+        }
+        if (viewModel.loadingError.value.isNotEmpty()) {
+            RetrySection(error = viewModel.loadingError.value) {
+                viewModel.loadPokemonPaginated()
+            }
         }
     }
 }
@@ -129,7 +147,7 @@ fun PokedexListEntry(
     val defaultDominantColor = MaterialTheme.colorScheme.surfaceVariant
     var dominantColor by remember { mutableStateOf(defaultDominantColor) }
     var isLoading by remember { mutableStateOf(true) }
-    var imageDrawable by remember { mutableStateOf<Drawable?>(null) } // Hold the loaded image
+    var imageDrawable by remember { mutableStateOf<Drawable?>(null) }
 
     Box(
         modifier = modifier
@@ -144,7 +162,7 @@ fun PokedexListEntry(
             )
             .clickable {
                 navController.navigate(
-                    PokedexScreens.DETAILSCREEN.name + "/{${dominantColor.toArgb()}}/{${entry.pokemonName}}"
+                    "${PokedexScreens.DETAILSCREEN.name}/${entry.pokemonName}/${dominantColor.toArgb()}"
                 )
             }
     ) {
@@ -153,7 +171,6 @@ fun PokedexListEntry(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxSize()
         ) {
-
             // Use the Coil ImageLoader to fetch the image with a target
             val context = LocalContext.current
             val imageLoader = context.imageLoader
@@ -223,16 +240,12 @@ fun PokedexListEntry(
 }
 
 
-
-
-
 @Composable
 fun PokedexRow(
     rowIndex: Int,
     entries: List<PokedexListEntry>,
     navController: NavController
 ) {
-    Column {
         Row {
             PokedexListEntry(
                 entry = entries[rowIndex*2],
@@ -241,7 +254,7 @@ fun PokedexRow(
                     .weight(1f)
             )
             Spacer(modifier = Modifier.height(16.dp))
-            if (entries.size >= rowIndex*2+2) {
+            if (entries.size > rowIndex*2+1) {
                 PokedexListEntry(
                     entry = entries[rowIndex*2+1],
                     navController = navController,
@@ -253,7 +266,6 @@ fun PokedexRow(
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
-    }
 }
 
 @Composable
@@ -265,6 +277,9 @@ fun PokemonList(
     val isLoading by remember { viewModel.isLoading }
     val loadError by remember { viewModel.loadingError }
     val endReached by remember { viewModel.endReached }
+    val isSearching by remember {
+        viewModel.isSearching
+    }
 
     LazyColumn {
         val itemCount = if (pokemonList.size % 2 == 0) {
@@ -273,14 +288,39 @@ fun PokemonList(
             pokemonList.size / 2 + 1
         }
 
-        items(itemCount) { items ->
-            if (items >= itemCount - 1 && !endReached) {
+        items(itemCount, key = {items -> items}) { items ->
+            if (items >= itemCount - 1 && !endReached && !isSearching) {
                 viewModel.loadPokemonPaginated()
             }
             PokedexRow(
                 rowIndex = items,
                 entries = pokemonList,
                 navController = navController
+            )
+        }
+    }
+}
+
+@Composable
+fun RetrySection (
+    error: String,
+    onRetry: () -> Unit
+) {
+    Column (
+        verticalArrangement = Arrangement.Bottom,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = 20.dp)
+    ) {
+        Toast.makeText(LocalContext.current, error, Toast.LENGTH_SHORT).show()
+        Spacer(modifier = Modifier.height(8.dp))
+        Button (
+            modifier = Modifier
+                .align(CenterHorizontally),
+            onClick = onRetry
+        ) {
+            Text (
+                text = "Retry"
             )
         }
     }

@@ -13,6 +13,7 @@ import com.iamashad.pokedex.repository.PokemonRepository
 import com.iamashad.pokedex.utils.Constants
 import com.iamashad.pokedex.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Locale
 import javax.inject.Inject
@@ -29,10 +30,38 @@ class PokemonListViewModel @Inject constructor(
     var isLoading = mutableStateOf(false)
     var endReached = mutableStateOf(false)
 
+    private var cachedPokemonlist = listOf<PokedexListEntry>()
+    private var isSearchStarting = true
+    var isSearching = mutableStateOf(false)
+
     init {
         loadPokemonPaginated()
     }
-
+    fun searchPokemon(query: String) {
+        val listToSearch = if (isSearchStarting) {
+            pokemonList.value
+        } else {
+            cachedPokemonlist
+        }
+        viewModelScope.launch(Dispatchers.Default) {
+            if (query.isEmpty()) {
+                pokemonList.value = cachedPokemonlist
+                isSearching.value = false
+                isSearchStarting = true
+                //return@launch
+            } else {
+                val results = listToSearch.filter {
+                    it.pokemonName.contains(query.trim(), ignoreCase = true) || it.number.toString() == query.trim()
+                }
+                if (isSearchStarting) {
+                    cachedPokemonlist = pokemonList.value
+                    isSearchStarting = false
+                }
+                pokemonList.value = results
+                isSearching.value = true
+            }
+        }
+    }
     fun loadPokemonPaginated() {
         viewModelScope.launch {
             isLoading.value = true
@@ -55,7 +84,7 @@ class PokemonListViewModel @Inject constructor(
                     pokemonList.value += pokedexEntries
                 }
                 else -> {
-                    loadingError.value = result.message!!
+                    loadingError.value = "Error Occurred"
                     isLoading.value = false
                 }
             }

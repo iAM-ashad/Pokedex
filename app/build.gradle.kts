@@ -92,13 +92,7 @@ dependencies {
     implementation (libs.coil)
     implementation (libs.accompanist.coil)
 
-    //Dagger - Hilt
-    /*implementation (libs.hilt.android)
-    ksp(libs.hilt.android.compiler)
-    implementation (libs.androidx.hilt.lifecycle.viewmodel)
-    ksp(libs.androidx.hilt.compiler)
-    implementation (libs.androidx.hilt.navigation.compose)
-    implementation(libs.androidx.hilt.navigation.fragment)*/
+    // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler.v252)
     implementation(libs.androidx.hilt.navigation.fragment)
