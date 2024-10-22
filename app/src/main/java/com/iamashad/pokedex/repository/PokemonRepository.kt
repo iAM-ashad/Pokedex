@@ -4,8 +4,10 @@ import com.iamashad.pokedex.model.Pokemon
 import com.iamashad.pokedex.model.PokemonList
 import com.iamashad.pokedex.network.PokeAPI
 import com.iamashad.pokedex.utils.Resource
+import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
 
+@ActivityScoped
 class PokemonRepository @Inject constructor(
     private val api: PokeAPI
 ) {
