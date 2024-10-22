@@ -38,8 +38,8 @@ fun DetailScreen (
     navController: NavController,
     dominantColor: Color,
     pokemonName: String,
-    topPadding: Dp = 20.dp,
-    pokemonImageSize: Dp = 200.dp,
+    topPadding: Dp = 60.dp,
+    pokemonImageSize: Dp = 275.dp,
     viewModel: DetailsViewModel
 ) {
     val pokemonInfo = produceState<Resource<Pokemon>>(initialValue = Resource.Loading()) {
@@ -50,14 +50,13 @@ fun DetailScreen (
         modifier = Modifier
             .fillMaxSize()
             .background(dominantColor)
-            .padding(16.dp)
     ) {
         PokemonDetailTopSection(
             navController,
             modifier = Modifier
-                .fillMaxWidth()
                 .fillMaxHeight(.2f)
                 .align(Alignment.TopCenter)
+                .fillMaxWidth()
         )
         PokemonStateWrapper(
             pokemonInfo = pokemonInfo,
