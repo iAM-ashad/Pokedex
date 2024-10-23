@@ -1,7 +1,14 @@
 package com.iamashad.pokedex.utils
 
 import androidx.compose.ui.graphics.Color
+import com.iamashad.pokedex.model.Stat
 import com.iamashad.pokedex.model.Type
+import com.iamashad.pokedex.ui.theme.AtkColor
+import com.iamashad.pokedex.ui.theme.DefColor
+import com.iamashad.pokedex.ui.theme.HPColor
+import com.iamashad.pokedex.ui.theme.SpAtkColor
+import com.iamashad.pokedex.ui.theme.SpDefColor
+import com.iamashad.pokedex.ui.theme.SpdColor
 import com.iamashad.pokedex.ui.theme.TypeBug
 import com.iamashad.pokedex.ui.theme.TypeDark
 import com.iamashad.pokedex.ui.theme.TypeDragon
@@ -42,6 +49,30 @@ fun parseTypeToColor(type: Type): Color {
         "dark" -> TypeDark
         "steel" -> TypeSteel
         "fairy" -> TypeFairy
+        else -> Color.Black
+    }
+}
+
+fun parseStatToAbbr(stat: Stat): String {
+    return when (stat.stat.name.toLowerCase(Locale.ROOT)) {
+        "hp" -> "HP"
+        "attack" -> "Atk"
+        "defense" -> "Def"
+        "special-attack" -> "SpAtk"
+        "special-defense" -> "SpDef"
+        "speed" -> "Spd"
+        else -> ""
+    }
+}
+
+fun parseStatToColor(stat: Stat): Color {
+    return when (stat.stat.name.toLowerCase(Locale.ROOT)) {
+        "hp" -> HPColor
+        "attack" -> AtkColor
+        "defense" -> DefColor
+        "special-attack" -> SpAtkColor
+        "special-defense" -> SpDefColor
+        "speed" -> SpdColor
         else -> Color.Black
     }
 }

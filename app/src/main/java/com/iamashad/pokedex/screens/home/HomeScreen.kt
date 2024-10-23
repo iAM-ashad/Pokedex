@@ -133,6 +133,7 @@ fun SearchBar(
             keyboardType = KeyboardType.Text,
             imeAction = ImeAction.Done
         ),
+        maxLines = 1,
         modifier = modifier
     )
 }
