@@ -1,7 +1,7 @@
+@file:Suppress("DEPRECATION")
+
 package com.iamashad.pokedex.screens.details
 
-import android.util.Log
-import android.widget.ImageView
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -48,12 +48,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
-import com.bumptech.glide.Glide
 import com.iamashad.pokedex.R
 import com.iamashad.pokedex.model.Pokemon
 import com.iamashad.pokedex.model.Type
+import com.iamashad.pokedex.utils.LoadImageWithGlide
 import com.iamashad.pokedex.utils.Resource
 import com.iamashad.pokedex.utils.parseStatToAbbr
 import com.iamashad.pokedex.utils.parseStatToColor
@@ -99,7 +98,6 @@ fun DetailScreen (
                 .shadow(10.dp, RoundedCornerShape(10.dp))
                 .clip(RoundedCornerShape(10.dp))
                 .background(MaterialTheme.colorScheme.surface),
-                //.align(Alignment.BottomCenter),
             loadingModifier = Modifier
                 .size(100.dp)
                 .align(Alignment.Center)
@@ -119,11 +117,6 @@ fun DetailScreen (
             if(pokemonInfo is Resource.Success) {
                 pokemonInfo.data?.sprites?.let {
                     val img = pokemonInfo.data.sprites.front_default
-                    when (img) {
-                        null -> {
-                            CircularProgressIndicator()
-                        }
-                        else -> {
                            LoadImageWithGlide (
                                imageUrl = img,
                                modifier = Modifier
@@ -131,8 +124,6 @@ fun DetailScreen (
                                    .offset(y = topPadding)
                                    .padding(bottom=20.dp)
                            )
-                        }
-                    }
                 }
             }
         }
@@ -182,8 +173,7 @@ fun PokemonStateWrapper(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp, vertical = 40.dp) // Adjust the padding for card-like appearance
-                    //.shadow(10.dp, RoundedCornerShape(10.dp), clip = false)
+                    .padding(horizontal = 16.dp, vertical = 40.dp)
                     .clip(RoundedCornerShape(10.dp))
                     .background(Color.Transparent)
             ) {
@@ -191,12 +181,11 @@ fun PokemonStateWrapper(
                     pokemonInfo = pokemonInfo.data!!,
                     modifier = modifier
                         .fillMaxWidth()
-                        .heightIn(min = 400.dp, max = 600.dp) // Control the height of the background
+                        .heightIn(min = 400.dp, max = 600.dp)
                         .background(
                             MaterialTheme.colorScheme.surface,
                             shape = RoundedCornerShape(10.dp)
                         )
-                        //.shadow(10.dp, RoundedCornerShape(10.dp))
                 )
             }
         }
@@ -214,28 +203,6 @@ fun PokemonStateWrapper(
             )
         }
     }
-}
-
-
-@Composable
-fun LoadImageWithGlide(
-    imageUrl: String,
-    modifier: Modifier = Modifier
-) {
-    AndroidView(
-        factory = { context ->
-            ImageView(context).apply {
-                scaleType = ImageView.ScaleType.CENTER_CROP
-            }
-        },
-        modifier = modifier,
-        update = { imageView ->
-            // Use Glide to load the image
-            Glide.with(imageView.context)
-                .load(imageUrl)
-                .into(imageView)
-        }
-    )
 }
 
 @Composable
@@ -367,7 +334,7 @@ fun PokemonStat(
     statValue: Int,
     statMaxValue: Int,
     statColor: Color,
-    height: Dp = 32.dp,
+    height: Dp = 35.dp,
     animDuration: Int = 1000,
     animDelay: Int = 0
 ) {
@@ -377,7 +344,7 @@ fun PokemonStat(
 
     val curPercent = animateFloatAsState(
         targetValue = if (animationPlayed) {
-            if (statMaxValue > 0) statValue / statMaxValue.toFloat() else 0f // Handle division by zero
+            if (statMaxValue > 0) statValue / statMaxValue.toFloat() else 0f
         } else 0f,
         animationSpec = tween(
             durationMillis = animDuration,
@@ -443,7 +410,6 @@ fun PokemonBaseStat(
             modifier = Modifier
                 .padding(start = 10.dp, top = 10.dp, bottom = 7.dp)
         )
-        //Spacer(modifier = Modifier.height(4.dp))
 
         for (i in pokemonInfo.stats.indices) {
             val stat = pokemonInfo.stats[i]

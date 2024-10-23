@@ -43,7 +43,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -81,7 +80,6 @@ fun HomeScreen(
                     .fillMaxWidth()
                     .padding(bottom = 20.dp, top = 25.dp)
             )
-            val keyboardController = LocalSoftwareKeyboardController.current
             SearchBar (
                 modifier = Modifier
                     .padding(bottom = 25.dp)
@@ -169,10 +167,9 @@ fun PokedexListEntry(
     ) {
         Column(
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
+            horizontalAlignment = CenterHorizontally,
             modifier = Modifier.fillMaxSize()
         ) {
-            // Use the Coil ImageLoader to fetch the image with a target
             val context = LocalContext.current
             val imageLoader = context.imageLoader
             val request = ImageRequest.Builder(context)
@@ -180,31 +177,28 @@ fun PokedexListEntry(
                 .crossfade(true)
                 .target(
                     onStart = {
-                        isLoading = true // Image loading started
+                        isLoading = true
                     },
                     onSuccess = { drawable ->
-                        isLoading = false // Image loading succeeded
-                        imageDrawable = drawable // Update image drawable state
-                        drawable?.let {
-                            // Extract the dominant color from the drawable
+                        isLoading = false
+                        imageDrawable = drawable
+                        drawable.let {
                             viewModel.calcDominantColor(it) { color ->
                                 dominantColor = color
                             }
                         }
                     },
                     onError = {
-                        isLoading = false // Image loading failed
+                        isLoading = false
                     }
                 )
                 .build()
 
-            // Trigger the image request
             DisposableEffect(entry.imgUrl) {
                 val disposable = imageLoader.enqueue(request)
                 onDispose { disposable.dispose() }
             }
 
-            // Show CircularProgressIndicator while loading
             if (isLoading) {
                 Box(
                     modifier = Modifier
@@ -215,12 +209,11 @@ fun PokedexListEntry(
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier
                             .scale(0.5f)
-                            .align(Alignment.Center)
+                            .align(Center)
                     )
                 }
             }
 
-            // Display the loaded image using the Drawable
             imageDrawable?.let { drawable ->
                 val painter = remember { androidx.compose.ui.graphics.painter.BitmapPainter((drawable as BitmapDrawable).bitmap.asImageBitmap()) }
                 Image(
@@ -230,7 +223,6 @@ fun PokedexListEntry(
                 )
             }
 
-            // Display Pokemon Name
             Text(
                 text = entry.pokemonName,
                 fontFamily = RobotoCondensed,
@@ -275,8 +267,6 @@ fun PokemonList(
     viewModel: PokemonListViewModel = hiltViewModel()
 ) {
     val pokemonList by remember { viewModel.pokemonList }
-    val isLoading by remember { viewModel.isLoading }
-    val loadError by remember { viewModel.loadingError }
     val endReached by remember { viewModel.endReached }
     val isSearching by remember {
         viewModel.isSearching

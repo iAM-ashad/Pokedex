@@ -1,6 +1,11 @@
 package com.iamashad.pokedex.utils
 
+import android.widget.ImageView
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.viewinterop.AndroidView
+import com.bumptech.glide.Glide
 import com.iamashad.pokedex.model.Stat
 import com.iamashad.pokedex.model.Type
 import com.iamashad.pokedex.ui.theme.AtkColor
@@ -51,6 +56,26 @@ fun parseTypeToColor(type: Type): Color {
         "fairy" -> TypeFairy
         else -> Color.Black
     }
+}
+@Composable
+fun LoadImageWithGlide(
+    imageUrl: String,
+    modifier: Modifier = Modifier
+) {
+    AndroidView(
+        factory = { context ->
+            ImageView(context).apply {
+                scaleType = ImageView.ScaleType.CENTER_CROP
+            }
+        },
+        modifier = modifier,
+        update = { imageView ->
+            // Use Glide to load the image
+            Glide.with(imageView.context)
+                .load(imageUrl)
+                .into(imageView)
+        }
+    )
 }
 
 fun parseStatToAbbr(stat: Stat): String {
